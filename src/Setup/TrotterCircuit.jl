@@ -1,5 +1,4 @@
 export create_circuit
-export create_circuit_Anna
 export create_circuit_Adam
 export circuit_order
 
@@ -42,6 +41,45 @@ function create_circuit(Nx::Int, Ny::Int, Order; B::Float64 = 0.0, V::Float64 = 
     return circuit_layers
 end
 
+
+function circuit_order(Nx::Int,Ny::Int; type="Anna")
+    
+    layers=[[] for _ in 1:4]
+    
+    if type=="Anna"
+        for row in 1:Ny
+            for col in 1:Nx
+                index = col+(row-1)*Nx
+                col<Nx && (col+row)%2==0 ? push!(layers[1], (index,index+1)) : nothing    
+                row<Ny && (col+row)%2==0 ? push!(layers[3], (index,index+Nx)) : nothing    
+                col<Nx && (col+row)%2==1 ? push!(layers[2], (index,index+1)) : nothing    
+                row<Ny && (col+row)%2==1 ? push!(layers[4], (index,index+Nx)) : nothing     
+            end
+        end
+    elseif type=="Adam"
+        for row in 1:Ny
+            for col in 1:Nx
+                index = col+(row-1)*Nx
+                col<Nx && col%2==1 ? push!(layers[1], (index,index+1)) : nothing    
+                col<Nx && col%2==0 ? push!(layers[3], (index,index+1)) : nothing    
+                row<Ny && row%2==1 ? push!(layers[2], (index,index+Nx)) : nothing    
+                row<Ny && row%2==0 ? push!(layers[4], (index,index+Nx)) : nothing     
+            end
+        end
+    else   
+        for row in 1:Ny
+            for col in 1:Nx
+                index = col+(row-1)*Nx
+                col<Nx && col%2==1 ? push!(layers[1], (index,index+1)) : nothing    
+                col<Nx && col%2==0 ? push!(layers[2], (index,index+1)) : nothing    
+                row<Ny && row%2==1 ? push!(layers[3], (index,index+Nx)) : nothing    
+                row<Ny && row%2==0 ? push!(layers[4], (index,index+Nx)) : nothing     
+            end
+        end
+    end
+    
+    return layers
+end
 
 
 function create_circuit_Adam(Nx::Int, Ny::Int; B::Float64 = 0.0, V::Float64 = 0.0, fermions::Bool = false)
@@ -101,42 +139,3 @@ function create_circuit_Adam(Nx::Int, Ny::Int; B::Float64 = 0.0, V::Float64 = 0.
     return layer_1, layer_2, layer_3, layer_4
 end
 
-
-function circuit_order(Nx::Int,Ny::Int; type="Anna")
-    
-    layers=[[] for _ in 1:4]
-    
-    if type=="Anna"
-        for row in 1:Ny
-            for col in 1:Nx
-                index = col+(row-1)*Nx
-                col<Nx && (col+row)%2==0 ? push!(layers[1], (index,index+1)) : nothing    
-                row<Ny && (col+row)%2==0 ? push!(layers[3], (index,index+Nx)) : nothing    
-                col<Nx && (col+row)%2==1 ? push!(layers[2], (index,index+1)) : nothing    
-                row<Ny && (col+row)%2==1 ? push!(layers[4], (index,index+Nx)) : nothing     
-            end
-        end
-    elseif type=="Adam"
-        for row in 1:Ny
-            for col in 1:Nx
-                index = col+(row-1)*Nx
-                col<Nx && col%2==1 ? push!(layers[1], (index,index+1)) : nothing    
-                col<Nx && col%2==0 ? push!(layers[3], (index,index+1)) : nothing    
-                row<Ny && row%2==1 ? push!(layers[2], (index,index+Nx)) : nothing    
-                row<Ny && row%2==0 ? push!(layers[4], (index,index+Nx)) : nothing     
-            end
-        end
-    else   
-        for row in 1:Ny
-            for col in 1:Nx
-                index = col+(row-1)*Nx
-                col<Nx && col%2==1 ? push!(layers[1], (index,index+1)) : nothing    
-                col<Nx && col%2==0 ? push!(layers[2], (index,index+1)) : nothing    
-                row<Ny && row%2==1 ? push!(layers[3], (index,index+Nx)) : nothing    
-                row<Ny && row%2==0 ? push!(layers[4], (index,index+Nx)) : nothing     
-            end
-        end
-    end
-    
-    return layers
-end
